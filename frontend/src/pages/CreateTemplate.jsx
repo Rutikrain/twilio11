@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Save, X, Info, Plus, Trash2 } from 'lucide-react';
+import { Save, X, Info, Plus, Trash2, ExternalLink } from 'lucide-react';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -123,7 +123,7 @@ const CreateTemplate = () => {
                 value={formData.content}
                 onChange={handleChange}
                 rows="6"
-                placeholder="Hello {{1}}, welcome to our service! Your order #{{2}} is ready."
+                placeholder=""
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-none"
                 required
               ></textarea>
@@ -193,7 +193,7 @@ const CreateTemplate = () => {
              <div className="bg-[#e5ddd5] p-3 rounded-2xl shadow-xl w-full max-w-[300px] border-[6px] border-slate-800">
                <div className="bg-white p-3 rounded-lg shadow-sm space-y-2 relative after:content-[''] after:absolute after:left-[-8px] after:top-2 after:border-[8px] after:border-transparent after:border-r-white">
                  <p className="text-xs text-slate-800 whitespace-pre-wrap break-words leading-relaxed">
-                   {formData.content || 'Your message will appear here...'}
+                   {formData.content}
                  </p>
                  <div className="flex justify-end">
                    <span className="text-[10px] text-slate-400 uppercase">12:00 PM</span>
@@ -201,10 +201,18 @@ const CreateTemplate = () => {
                </div>
                
                {formData.buttons.map((btn, idx) => (
-                 <div key={idx} className="mt-2 text-center bg-white/90 backdrop-blur py-2 rounded-lg text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2 cursor-default border-t border-slate-100">
+                 <button 
+                   key={idx} 
+                   type="button"
+                   onClick={() => {
+                     if (btn.type === 'URL' && btn.value) window.open(btn.value.startsWith('http') ? btn.value : `https://${btn.value}`, '_blank');
+                     else if (btn.value) alert(`Calling: ${btn.value}`);
+                   }}
+                   className="w-full mt-2 text-center bg-white/90 backdrop-blur py-2 rounded-lg text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer border-t border-slate-100 hover:bg-white transition-colors"
+                 >
                    {btn.text || 'Button Label'}
                    {btn.type === 'URL' && <ExternalLink size={12} />}
-                 </div>
+                 </button>
                ))}
              </div>
              

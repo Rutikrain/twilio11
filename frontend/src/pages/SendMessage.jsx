@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Send, CheckCircle2, AlertCircle, Info, ChevronRight, Phone } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, Info, ChevronRight, Phone, ExternalLink } from 'lucide-react';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -26,8 +26,8 @@ const SendMessage = () => {
       console.error('Error fetching templates:', err);
       // Dummy data for demo if backend not running
       const dummy = [
-        { _id: '1', name: 'welcome_message', content: 'Hello {{1}}, welcome to {{2}}!', status: 'Approved' },
-        { _id: '2', name: 'order_shipped', content: 'Hi {{1}}, your order #{{2}} has been shipped via {{3}}.', status: 'Approved' }
+        { _id: '1', name: 'welcome_message', content: 'Hello {{1}}, welcome to {{2}}!', status: 'Approved', buttons: [{ type: 'URL', text: 'Visit Website', value: 'https://example.com' }] },
+        { _id: '2', name: 'order_shipped', content: 'Hi {{1}}, your order #{{2}} has been shipped via {{3}}.', status: 'Approved', buttons: [{ type: 'PHONE_NUMBER', text: 'Call Support', value: '+1234567890' }] }
       ];
       setTemplates(dummy);
       handleSelectTemplate(dummy[0]);
@@ -159,13 +159,27 @@ const SendMessage = () => {
             <div className="bg-[#e5ddd5] p-3 rounded-2xl shadow-xl w-full max-w-[300px] border-[6px] border-slate-800 mx-auto">
                <div className="bg-white p-3 rounded-lg shadow-sm space-y-2 relative after:content-[''] after:absolute after:left-[-8px] after:top-2 after:border-[8px] after:border-transparent after:border-r-white">
                  <p className="text-xs text-slate-800 whitespace-pre-wrap break-words leading-relaxed">
-                   {getPreview() || 'Your message will appear here...'}
+                   {getPreview()}
                  </p>
                  <div className="flex justify-end gap-1 items-center">
                    <span className="text-[10px] text-slate-400 uppercase">12:00 PM</span>
                    <CheckCircle2 size={10} className="text-slate-300" />
                  </div>
                </div>
+                
+                {selectedTemplate?.buttons?.map((btn, idx) => (
+                  <button 
+                    key={idx} 
+                    onClick={() => {
+                      if (btn.type === 'URL') window.open(btn.value.startsWith('http') ? btn.value : `https://${btn.value}`, '_blank');
+                      else alert(`Calling: ${btn.value}`);
+                    }}
+                    className="w-full mt-2 text-center bg-white/90 backdrop-blur py-2 rounded-lg text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer border-t border-slate-100 hover:bg-white transition-colors"
+                  >
+                    {btn.text || 'Button Label'}
+                    {btn.type === 'URL' && <ExternalLink size={12} />}
+                  </button>
+                ))}
             </div>
 
             <div className="mt-8 space-y-4">

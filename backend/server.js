@@ -13,8 +13,9 @@ const client = twilio(
 );
 
 let templates = [
-  { _id: "1", name: "welcome_template", category: "Marketing", content: "Hello {{1}}, welcome to {{2}}!", status: "Approved", language: "en-US", createdAt: new Date() },
-  { _id: "2", name: "order_update", category: "Utility", content: "Hi {{1}}, your order #{{2}} has been shipped.", status: "Pending", language: "en-US", createdAt: new Date() },
+  { _id: "1", name: "welcome_template", category: "Marketing", content: "Hello {{1}}, welcome to {{2}}!", status: "Approved", language: "en-US", createdAt: new Date(), buttons: [{ type: 'URL', text: 'Visit Website', value: 'https://example.com' }] },
+  { _id: "2", name: "order_update", category: "Utility", content: "Hi {{1}}, your order #{{2}} has been shipped.", status: "Pending", language: "en-US", createdAt: new Date(), buttons: [{ type: 'PHONE_NUMBER', text: 'Call Support', value: '+1234567890' }] },
+  { _id: "3", name: "me", category: "Marketing", content: "Hi, this is me!", status: "Approved", language: "en-US", createdAt: new Date(), buttons: [] },
 ];
 
 // TEST ROUTE
@@ -28,8 +29,8 @@ app.get("/api/templates", (req, res) => {
 });
 
 // CREATE TEMPLATE
-app.post("/api/templates/create", (req, res) => {
-  const { name, content, category, language } = req.body;
+app.post("/api/templates", (req, res) => {
+  const { name, content, category, language, buttons } = req.body;
 
   const newTemplate = {
     _id: String(Date.now()),
@@ -37,6 +38,7 @@ app.post("/api/templates/create", (req, res) => {
     content,
     category: category || "Marketing",
     language: language || "en-US",
+    buttons: buttons || [],
     status: "Approved",
     createdAt: new Date(),
   };
