@@ -63,6 +63,14 @@ app.post("/api/templates/:id/approve", (req, res) => {
   res.json(template);
 });
 
+// APPROVE TEMPLATE
+app.post("/api/templates/:id/approve", (req, res) => {
+  const template = templates.find(t => t._id === req.params.id);
+  if (!template) return res.status(404).json({ error: "Template not found" });
+  template.status = "Approved";
+  res.json(template);
+});
+
 // ✅ Send WhatsApp Message API (User's simplified route)
 app.post("/api/send-message", async (req, res) => {
   const { to, message } = req.body;
