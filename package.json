@@ -14,8 +14,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "npm run dev --prefix frontend",
+    "dev": "npx concurrently \"npm run dev:frontend\" \"npm run dev:twilio\"",
     "dev:frontend": "npm run dev --prefix frontend",
+    "dev:twilio": "npm run dev --prefix twilio-api",
     "dev:backend": "npm run dev --prefix backend",
     "build": "npm install --prefix frontend && npm run build --prefix frontend",
     "install:frontend": "npm install --prefix frontend"

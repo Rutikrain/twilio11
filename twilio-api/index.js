@@ -39,7 +39,7 @@ app.post("/api/templates", (req, res) => {
     category: category || "Marketing",
     language: language || "en-US",
     buttons: buttons || [],
-    status: "Approved",
+    status: "Pending",
     createdAt: new Date(),
   };
 
@@ -52,6 +52,14 @@ app.post("/api/templates/:id/submit", (req, res) => {
   const template = templates.find(t => t._id === req.params.id);
   if (!template) return res.status(404).json({ error: "Template not found" });
   template.status = "Pending";
+  res.json(template);
+});
+
+// APPROVE TEMPLATE
+app.post("/api/templates/:id/approve", (req, res) => {
+  const template = templates.find(t => t._id === req.params.id);
+  if (!template) return res.status(404).json({ error: "Template not found" });
+  template.status = "Approved";
   res.json(template);
 });
 

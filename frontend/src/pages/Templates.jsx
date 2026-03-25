@@ -107,12 +107,19 @@ const Templates = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                       {template.status === 'Draft' && (
+                       {(template.status === 'Pending' || template.status === 'Draft') && (
                          <button 
-                           onClick={() => handleSubmit(template._id)}
+                           onClick={async () => {
+                             try {
+                               await axios.post(`${API_URL}/templates/${template._id}/${template.status === 'Draft' ? 'submit' : 'approve'}`);
+                               fetchTemplates();
+                             } catch (err) {
+                               alert('Failed to update template status');
+                             }
+                           }}
                            className="text-emerald-600 hover:text-emerald-700 font-semibold text-sm underline px-2 py-1 rounded"
                          >
-                           Submit
+                           {template.status === 'Draft' ? 'Submit' : 'Approve'}
                          </button>
                        )}
                        <button className="text-slate-400 hover:text-slate-600 p-1">
