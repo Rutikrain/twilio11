@@ -55,8 +55,26 @@ app.post("/api/templates/:id/submit", (req, res) => {
   res.json(template);
 });
 
+// ✅ Send WhatsApp Message API (User's simplified route)
+app.post("/api/send-message", async (req, res) => {
+  const { to, message } = req.body;
+
+  try {
+    const response = await client.messages.create({
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: `whatsapp:${to}`,
+      body: message,
+    });
+
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ✅ Send WhatsApp Message API (Template-based)
 app.post("/api/templates/send", async (req, res) => {
-  const { templateId, to } = req.body;
+  const { templateId, to, variables } = req.body;
 
   const template = templates.find(t => t._id === templateId);
 
@@ -68,17 +86,27 @@ app.post("/api/templates/send", async (req, res) => {
     return res.status(400).json({ error: "Template not approved" });
   }
 
+  // Handle template variables
+  let messageBody = template.content;
+  if (variables) {
+    Object.keys(variables).forEach(key => {
+      messageBody = messageBody.replace(`{{${key}}}`, variables[key]);
+    });
+  }
+
   try {
-    const message = await client.messages.create({
-      body: template.content,
-      from: "whatsapp:+14155238886",
+    const response = await client.messages.create({
+      body: messageBody,
+      from: process.env.TWILIO_PHONE_NUMBER,
       to: `whatsapp:${to}`
     });
 
-    res.json({ success: true, sid: message.sid });
+    res.json({ success: true, sid: response.sid });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.listen(5000, () => console.log("Server started on port 5000"));
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
+});

@@ -57,16 +57,18 @@ const SendMessage = () => {
     e.preventDefault();
     setStatus('sending');
     try {
-      // Logic for sending message goes here
-      // For demo, we'll simulate a 1.5s delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await axios.post(`${API_URL}/templates/send`, {
+        templateId: selectedTemplate._id,
+        to: phoneNumber,
+        variables
+      });
       setStatus('sent');
       setPhoneNumber('');
-      // Reset variables
       const resetVars = { ...variables };
       Object.keys(resetVars).forEach(k => resetVars[k] = '');
       setVariables(resetVars);
     } catch (err) {
+      console.error('Send error:', err);
       setStatus('error');
     }
   };
