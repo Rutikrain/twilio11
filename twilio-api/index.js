@@ -68,9 +68,21 @@ app.post("/api/send-message", async (req, res) => {
   let { to, message } = req.body;
   console.log(`Original 'to': ${to}`);
   
-  // Clean the number: remove spaces and handle prefix
+  // Clean the number: remove spaces
   to = to.replace(/\s+/g, '');
-  const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:${to}`;
+  
+  // Ensure it starts with + if it's not already prefixed with whatsapp:
+  let cleanTo = to.startsWith('whatsapp:') ? to.replace('whatsapp:', '') : to;
+  if (!cleanTo.startsWith('+')) {
+    // If it's a 10 digit number, assume +91 (common in this project's context)
+    if (cleanTo.length === 10) {
+      cleanTo = `+91${cleanTo}`;
+    } else {
+      cleanTo = `+${cleanTo}`;
+    }
+  }
+  
+  const formattedTo = `whatsapp:${cleanTo}`;
   
   console.log(`Sending simple message to ${formattedTo}: ${message}`);
 
@@ -115,9 +127,21 @@ app.post("/api/templates/send", async (req, res) => {
   
   console.log(`Final message body: ${messageBody}`);
 
-  // Clean the number: remove spaces and handle prefix
+  // Clean the number: remove spaces
   to = to.replace(/\s+/g, '');
-  const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:${to}`;
+  
+  // Ensure it starts with + if it's not already prefixed with whatsapp:
+  let cleanTo = to.startsWith('whatsapp:') ? to.replace('whatsapp:', '') : to;
+  if (!cleanTo.startsWith('+')) {
+    // If it's a 10 digit number, assume +91 (common in this project's context)
+    if (cleanTo.length === 10) {
+      cleanTo = `+91${cleanTo}`;
+    } else {
+      cleanTo = `+${cleanTo}`;
+    }
+  }
+  
+  const formattedTo = `whatsapp:${cleanTo}`;
   
   console.log(`Final 'to' for Twilio: ${formattedTo}`);
 
