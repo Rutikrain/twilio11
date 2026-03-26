@@ -65,13 +65,19 @@ app.post("/api/templates/:id/approve", (req, res) => {
 
 // ✅ Send WhatsApp Message API (User's simplified route)
 app.post("/api/send-message", async (req, res) => {
-  const { to, message } = req.body;
-  console.log(`Sending simple message to ${to}: ${message}`);
+  let { to, message } = req.body;
+  console.log(`Original 'to': ${to}`);
+  
+  // Clean the number: remove spaces and handle prefix
+  to = to.replace(/\s+/g, '');
+  const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:${to}`;
+  
+  console.log(`Sending simple message to ${formattedTo}: ${message}`);
 
   try {
     const response = await client.messages.create({
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: `whatsapp:${to}`,
+      to: formattedTo,
       body: message,
     });
     console.log(`Message sent! SID: ${response.sid}`);
@@ -84,8 +90,8 @@ app.post("/api/send-message", async (req, res) => {
 
 // ✅ Send WhatsApp Message API (Template-based)
 app.post("/api/templates/send", async (req, res) => {
-  const { templateId, to, variables } = req.body;
-  console.log(`Sending template message. ID: ${templateId}, To: ${to}, Vars:`, variables);
+  let { templateId, to, variables } = req.body;
+  console.log(`Original 'to': ${to}, ID: ${templateId}`);
 
   const template = templates.find(t => t._id === templateId);
 
@@ -109,11 +115,17 @@ app.post("/api/templates/send", async (req, res) => {
   
   console.log(`Final message body: ${messageBody}`);
 
+  // Clean the number: remove spaces and handle prefix
+  to = to.replace(/\s+/g, '');
+  const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:${to}`;
+  
+  console.log(`Final 'to' for Twilio: ${formattedTo}`);
+
   try {
     const response = await client.messages.create({
       body: messageBody,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: `whatsapp:${to}`
+      to: formattedTo
     });
 
     console.log(`Template message sent! SID: ${response.sid}`);
