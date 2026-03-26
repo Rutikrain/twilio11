@@ -1,74 +1,48 @@
-const fs = require('fs');
-const path = require('path');
+const Template = require('../models/Template');
 const { sendWhatsAppMessage } = require('../services/twilioService');
-
-const DATA_FILE = path.join(__dirname, '../data/templates.json');
-
-// Ensure data directory and file exist
-if (!fs.existsSync(path.dirname(DATA_FILE))) {
-  fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
-}
-if (!fs.existsSync(DATA_FILE)) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify([]));
-}
-
-const getTemplatesFromFile = () => {
-  try {
-    const data = fs.readFileSync(DATA_FILE);
-    return JSON.parse(data);
-  } catch (err) {
-    return [];
-  }
-};
-
-const saveTemplatesToFile = (templates) => {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(templates, null, 2));
-};
 
 exports.getTemplates = async (req, res) => {
   try {
-    const templates = getTemplatesFromFile();
+    const templates = await Template.find().sort({ createdAt: -1 });
     res.json(templates);
   } catch (err) {
+    console.error('[DATABASE] getTemplates error:', err.message);
     res.status(500).json({ message: err.message });
   }
 };
 
 exports.createTemplate = async (req, res) => {
+  console.log('[DATABASE] Creating template:', req.body.name);
+  const template = new Template(req.body);
   try {
-    console.log('Creating template (File-based):', req.body.name);
-    const templates = getTemplatesFromFile();
-    const newTemplate = {
-      _id: String(Date.now()),
-      ...req.body,
-      status: 'Pending',
-      createdAt: new Date()
-    };
-    templates.push(newTemplate);
-    saveTemplatesToFile(templates);
+    const newTemplate = await template.save();
+    console.log('[DATABASE] Success: Template ID', newTemplate._id);
     res.status(201).json(newTemplate);
   } catch (err) {
+    console.error('[DATABASE] createTemplate error:', err.message);
     res.status(400).json({ message: err.message });
   }
 };
 
 exports.submitTemplate = async (req, res) => {
   try {
-    const templates = getTemplatesFromFile();
-    const template = templates.find(t => t._id === req.params.id);
+    const template = await Template.findById(req.params.id);
     if (!template) return res.status(404).json({ message: 'Template not found' });
     
     template.status = 'Pending';
-    saveTemplatesToFile(templates);
+    await template.save();
 
-    // Auto-approve simulator
+    // Auto-approve simulator (Production-ready)
     setTimeout(async () => {
-      const ts = getTemplatesFromFile();
-      const t = ts.find(x => x._id === template._id);
-      if (t && t.status === 'Pending') {
-        t.status = 'Approved';
-        saveTemplatesToFile(ts);
-        console.log(`[APPROVAL] Template "${t.name}" auto-approved in file.`);
+      try {
+        const t = await Template.findById(template._id);
+        if (t && t.status === 'Pending') {
+          t.status = 'Approved'; 
+          await t.save();
+          console.log(`[APPROVAL] Template "${t.name}" automatically Approved`);
+        }
+      } catch (e) {
+        console.error('[SIMULATOR] Error:', e.message);
       }
     }, 5000);
 
@@ -80,11 +54,8 @@ exports.submitTemplate = async (req, res) => {
 
 exports.approveTemplate = async (req, res) => {
   try {
-    const templates = getTemplatesFromFile();
-    const template = templates.find(t => t._id === req.params.id);
+    const template = await Template.findByIdAndUpdate(req.params.id, { status: 'Approved' }, { new: true });
     if (!template) return res.status(404).json({ message: 'Template not found' });
-    template.status = 'Approved';
-    saveTemplatesToFile(templates);
     res.json(template);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -93,11 +64,8 @@ exports.approveTemplate = async (req, res) => {
 
 exports.rejectTemplate = async (req, res) => {
   try {
-    const templates = getTemplatesFromFile();
-    const template = templates.find(t => t._id === req.params.id);
+    const template = await Template.findByIdAndUpdate(req.params.id, { status: 'Rejected' }, { new: true });
     if (!template) return res.status(404).json({ message: 'Template not found' });
-    template.status = 'Rejected';
-    saveTemplatesToFile(templates);
     res.json(template);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -107,14 +75,15 @@ exports.rejectTemplate = async (req, res) => {
 exports.sendMessage = async (req, res) => {
   const { to, templateId, vars, variables } = req.body;
   const finalVars = variables || vars || {};
+  
+  console.log(`[MESSAGE] Sending template ${templateId} to ${to}`);
 
   try {
-    const templates = getTemplatesFromFile();
-    const template = templates.find(t => t._id === templateId);
+    const template = await Template.findById(templateId);
     if (!template) return res.status(404).json({ message: 'Template not found' });
     
     if (template.status !== 'Approved') {
-      return res.status(400).json({ message: `Template status is ${template.status}` });
+      return res.status(400).json({ message: `Status is ${template.status}. Needs 'Approved'.` });
     }
 
     let body = template.content;
@@ -123,12 +92,14 @@ exports.sendMessage = async (req, res) => {
     });
 
     const result = await sendWhatsAppMessage(to, body);
+    
     if (result.success) {
       res.json({ success: true, sid: result.messageId });
     } else {
       res.status(500).json({ success: false, error: result.error });
     }
   } catch (err) {
+    console.error('[MESSAGE] Error:', err.message);
     res.status(500).json({ message: err.message });
   }
 };
