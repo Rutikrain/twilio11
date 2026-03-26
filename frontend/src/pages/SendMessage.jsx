@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Send, CheckCircle2, AlertCircle, Info, ChevronRight, Phone, ExternalLink } from 'lucide-react';
-
-const API_URL = 'http://localhost:5000/api';
+import API_URL from '../api';
 
 const SendMessage = () => {
   const [templates, setTemplates] = useState([]);

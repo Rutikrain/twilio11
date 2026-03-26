@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Save, X, Info, Plus, Trash2, ExternalLink } from 'lucide-react';
-
-const API_URL = 'http://localhost:5000/api';
+import API_URL from '../api';
 
 const CreateTemplate = () => {
   const navigate = useNavigate();

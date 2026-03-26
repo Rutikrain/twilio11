@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, Plus, Filter, MoreVertical, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const API_URL = 'http://localhost:5000/api';
+import API_URL from '../api';
 
 const Templates = () => {
   const [templates, setTemplates] = useState([]);
