@@ -31,6 +31,7 @@ app.get("/api/templates", (req, res) => {
 // CREATE TEMPLATE
 app.post("/api/templates", (req, res) => {
   const { name, content, category, language, buttons } = req.body;
+  console.log(`Creating template: ${name}`);
 
   const newTemplate = {
     _id: String(Date.now()),
@@ -44,6 +45,7 @@ app.post("/api/templates", (req, res) => {
   };
 
   templates.push(newTemplate);
+  console.log(`Template created successfully: ${name}`);
   res.json(newTemplate);
 });
 

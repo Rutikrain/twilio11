@@ -1,128 +1,47 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const cors = require("cors");
-const twilio = require("twilio");
 require("dotenv").config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB Connection Error:', err.message));
 
-let templates = [
-  { _id: "1", name: "welcome_template", category: "Marketing", content: "Hello {{1}}, welcome to {{2}}!", status: "Approved", language: "en-US", createdAt: new Date(), buttons: [{ type: 'URL', text: 'Visit Website', value: 'https://example.com' }] },
-  { _id: "2", name: "order_update", category: "Utility", content: "Hi {{1}}, your order #{{2}} has been shipped.", status: "Pending", language: "en-US", createdAt: new Date(), buttons: [{ type: 'PHONE_NUMBER', text: 'Call Support', value: '+1234567890' }] },
-  { _id: "3", name: "me", category: "Marketing", content: "Hi, this is me!", status: "Approved", language: "en-US", createdAt: new Date(), buttons: [] },
-];
+// Routes
+const templateRoutes = require('./routes/templates');
+app.use('/api/templates', templateRoutes);
 
-// TEST ROUTE
-app.get("/", (req, res) => {
-  res.send("Server running");
-});
-
-// GET ALL TEMPLATES
-app.get("/api/templates", (req, res) => {
-  res.json(templates);
-});
-
-// CREATE TEMPLATE
-app.post("/api/templates", (req, res) => {
-  const { name, content, category, language, buttons } = req.body;
-
-  const newTemplate = {
-    _id: String(Date.now()),
-    name,
-    content,
-    category: category || "Marketing",
-    language: language || "en-US",
-    buttons: buttons || [],
-    status: "Pending",
-    createdAt: new Date(),
-  };
-
-  templates.push(newTemplate);
-  res.json(newTemplate);
-});
-
-// SUBMIT TEMPLATE (for status change)
-app.post("/api/templates/:id/submit", (req, res) => {
-  const template = templates.find(t => t._id === req.params.id);
-  if (!template) return res.status(404).json({ error: "Template not found" });
-  template.status = "Pending";
-  res.json(template);
-});
-
-// APPROVE TEMPLATE
-app.post("/api/templates/:id/approve", (req, res) => {
-  const template = templates.find(t => t._id === req.params.id);
-  if (!template) return res.status(404).json({ error: "Template not found" });
-  template.status = "Approved";
-  res.json(template);
-});
-
-// APPROVE TEMPLATE
-app.post("/api/templates/:id/approve", (req, res) => {
-  const template = templates.find(t => t._id === req.params.id);
-  if (!template) return res.status(404).json({ error: "Template not found" });
-  template.status = "Approved";
-  res.json(template);
-});
-
-// ✅ Send WhatsApp Message API (User's simplified route)
+// Additional specific routes (if needed to match project history)
 app.post("/api/send-message", async (req, res) => {
+  const { sendWhatsAppMessage } = require('./services/twilioService');
   const { to, message } = req.body;
-
-  try {
-    const response = await client.messages.create({
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: `whatsapp:${to}`,
-      body: message,
-    });
-
-    res.json({ success: true, data: response });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  const result = await sendWhatsAppMessage(to, message);
+  if (result.success) {
+    res.json(result);
+  } else {
+    res.status(500).json(result);
   }
 });
 
-// ✅ Send WhatsApp Message API (Template-based)
-app.post("/api/templates/send", async (req, res) => {
-  const { templateId, to, variables } = req.body;
-
-  const template = templates.find(t => t._id === templateId);
-
-  if (!template) {
-    return res.status(404).json({ error: "Template not found" });
-  }
-
-  if (template.status !== "Approved") {
-    return res.status(400).json({ error: "Template not approved" });
-  }
-
-  // Handle template variables
-  let messageBody = template.content;
-  if (variables) {
-    Object.keys(variables).forEach(key => {
-      messageBody = messageBody.replace(`{{${key}}}`, variables[key]);
-    });
-  }
-
-  try {
-    const response = await client.messages.create({
-      body: messageBody,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: `whatsapp:${to}`
-    });
-
-    res.json({ success: true, sid: response.sid });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// Hello route
+app.get("/", (req, res) => {
+  res.send("Twilio SaaS Backend Running");
 });
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+// Error Handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
