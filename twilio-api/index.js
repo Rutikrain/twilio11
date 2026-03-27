@@ -30,8 +30,16 @@ app.get("/api/templates", (req, res) => {
 
 // CREATE TEMPLATE
 app.post("/api/templates", (req, res) => {
+  console.log("BODY RECEIVED:", req.body);
   const { name, content, category, language, buttons } = req.body;
-  console.log(`Creating template: ${name}`);
+  
+  // Validation Check Requirement
+  if (!name || !content) {
+    console.error("❌ Validation Failed: Missing 'name' or 'content'");
+    return res.status(400).json({ error: "Missing required fields: 'name' and 'content' are required." });
+  }
+
+  console.log(`✅ Creating template: ${name}`);
 
   const newTemplate = {
     _id: String(Date.now()),
@@ -46,6 +54,16 @@ app.post("/api/templates", (req, res) => {
 
   templates.push(newTemplate);
   console.log(`Template created successfully: ${name}`);
+
+  // Simulating auto-approval process
+  setTimeout(() => {
+    const t = templates.find(temp => temp._id === newTemplate._id);
+    if (t) {
+      t.status = "Approved";
+      console.log(`[APPROVAL] Template "${t.name}" automatically Approved`);
+    }
+  }, 3000);
+
   res.json(newTemplate);
 });
 
