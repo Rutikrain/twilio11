@@ -20,7 +20,10 @@
     "dev:twilio": "npm run dev --prefix twilio-api",
     "dev:backend": "npm run dev --prefix backend",
     "build": "npm install --prefix frontend && npm run build --prefix frontend",
-    "install:frontend": "npm install --prefix frontend"
+    "install:frontend": "npm install --prefix frontend",
+    "build:backend": "npm install --prefix backend",
+    "start": "node backend/server.js",
+    "start:twilio": "node twilio-api/index.js"
   },
   "eslintConfig": {
     "extends": [
