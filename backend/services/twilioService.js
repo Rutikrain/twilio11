@@ -1,10 +1,14 @@
 require('dotenv').config();
 const twilio = require('twilio');
 
-let client;
-if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN &&
-    !process.env.TWILIO_ACCOUNT_SID.includes('your_')) {
-  client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const TWILIO_SID = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH = process.env.TWILIO_AUTH_TOKEN;
+
+if (TWILIO_SID && TWILIO_AUTH && !TWILIO_SID.includes('your_')) {
+  client = twilio(TWILIO_SID, TWILIO_AUTH);
+  console.log('✅ Twilio Client Initialized');
+} else {
+  console.warn('⚠️ Twilio Credentials missing or invalid. Running in SIMULATION mode.');
 }
 
 const sendWhatsAppMessage = async (to, body) => {
@@ -36,17 +40,20 @@ const sendWhatsAppMessage = async (to, body) => {
   }
 
   try {
-    console.log(`[TWILIO] Sending from ${formattedFrom} to ${formattedTo}`);
+    console.log(`[TWILIO] Attempting to send from ${formattedFrom} to ${formattedTo}...`);
     const message = await client.messages.create({
       from: formattedFrom,
       to: formattedTo,
       body: body
     });
-    console.log(`[TWILIO] Success. SID: ${message.sid}`);
+    console.log(`✅ [TWILIO] Success! Message SID: ${message.sid}`);
     return { success: true, messageId: message.sid };
   } catch (error) {
-    console.error('[TWILIO] Send Error:', error.message);
-    return { success: false, error: error.message };
+    console.error('❌ [TWILIO] Send Error:');
+    console.error(`   - Code: ${error.code || 'Unknown'}`);
+    console.error(`   - Message: ${error.message}`);
+    console.error(`   - More Info: ${error.moreInfo || 'N/A'}`);
+    return { success: false, error: error.message, code: error.code };
   }
 };
 
