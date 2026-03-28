@@ -1,5 +1,5 @@
 // Base API URL configuration
-// Using the deployed Render.com backend
+// Use local backend for development to bypass Render issues, and Render for Vercel
 const API_BASE_URL = 'https://twilio11-1.onrender.com/api';
 
 export default API_BASE_URL;

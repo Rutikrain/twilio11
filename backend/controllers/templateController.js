@@ -11,6 +11,16 @@ exports.getTemplates = async (req, res) => {
   }
 };
 
+exports.getTemplateById = async (req, res) => {
+  try {
+    const template = await Template.findById(req.params.id);
+    if (!template) return res.status(404).json({ message: 'Template not found' });
+    res.json(template);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.createTemplate = async (req, res) => {
   console.log('[DATABASE] Creating template:', req.body.name);
   const template = new Template(req.body);
@@ -100,6 +110,26 @@ exports.sendMessage = async (req, res) => {
     }
   } catch (err) {
     console.error('[MESSAGE] Error:', err.message);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateTemplate = async (req, res) => {
+  try {
+    const template = await Template.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!template) return res.status(404).json({ message: 'Template not found' });
+    res.json(template);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+exports.deleteTemplate = async (req, res) => {
+  try {
+    const template = await Template.findByIdAndDelete(req.params.id);
+    if (!template) return res.status(404).json({ message: 'Template not found' });
+    res.json({ message: 'Template deleted' });
+  } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };

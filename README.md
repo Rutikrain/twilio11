@@ -1,70 +1,78 @@
-# Getting Started with Create React App
+# 📱 Twilio SaaS Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A premium, full-stack WhatsApp message management system built with React, Node.js, and MongoDB. This dashboard allows businesses to manage message templates, simulate approval workflows, and send messages through the Twilio API.
 
-## Available Scripts
+## ✨ Features
 
-In the project directory, you can run:
+- **Template Management**: Full CRUD (Create, Read, Update, Delete) for WhatsApp message templates.
+- **Approval Workflow**: Support for template states: `Draft`, `Pending`, `Approved`, and `Rejected`.
+- **Live Preview**: Real-time WhatsApp-style message preview during template creation.
+- **Interactive Buttons**: Support for URL and Call actions in templates.
+- **Unified Dashboard**: Clean, modern UI with search, filtering, and status tracking.
+- **Render Ready**: Pre-configured for deployment on Render.com (Backend) and Vercel (Frontend).
 
-### `npm start`
+## 🚀 Getting Started
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Prerequisites
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Node.js (v18+)
+- MongoDB Atlas account (for cloud persistence)
+- Twilio account (optional for simulation mode)
 
-### `npm test`
+### Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone the repository:
+   ```bash
+   git clone <your-repo-url>
+   ```
 
-### `npm run build`
+2. Install root dependencies:
+   ```bash
+   npm install
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Setup environment variables in `backend/.env`:
+   ```env
+   PORT=5000
+   MONGO_URI=your_mongodb_atlas_uri
+   TWILIO_ACCOUNT_SID=your_sid
+   TWILIO_AUTH_TOKEN=your_token
+   TWILIO_PHONE_NUMBER=whatsapp:your_number
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Running Locally
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Use the root-level scripts to manage both services simultaneously:
 
-### `npm run eject`
+```bash
+# Start both Frontend & Backend
+npm run dev
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Start only Backend
+npm run dev:backend
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Start only Frontend
+npm run dev:frontend
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🛠️ Technology Stack
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **Frontend**: React, Tailwind CSS, Lucide Icons, Axios.
+- **Backend**: Node.js, Express.js.
+- **Database**: MongoDB with Mongoose.
+- **API**: Twilio WhatsApp API.
 
-## Learn More
+## 📁 Project Structure
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- `frontend/`: React application with styling and components.
+- `backend/`: Express server, controllers, and MongoDB models.
+- `twilio-api/`: Helper service for Twilio integrations.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🌐 API Configuration
 
-### Code Splitting
+The frontend is configured to connect to the Render-hosted backend by default. You can modify this in `frontend/src/api.js`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Current Backend: `https://twilio11-1.onrender.com/api`
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+*Created with ❤️ for professional Saas dashboards.*

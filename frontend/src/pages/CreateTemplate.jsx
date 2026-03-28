@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Save, X, Info, Plus, Trash2, ExternalLink } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Save, X, Info, Plus, Trash2, ExternalLink, Loader2 } from 'lucide-react';
 import API_URL from '../api';
 
 const CreateTemplate = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     category: 'Marketing',
@@ -13,6 +15,27 @@ const CreateTemplate = () => {
     content: '',
     buttons: []
   });
+
+  const isEdit = !!id;
+
+  React.useEffect(() => {
+    if (isEdit) {
+      fetchTemplate();
+    }
+  }, [id]);
+
+  const fetchTemplate = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}/templates/${id}`);
+      setFormData(res.data);
+    } catch (err) {
+      alert('Error fetching template: ' + err.message);
+      navigate('/templates');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,19 +62,31 @@ const CreateTemplate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/templates`, formData);
+      if (isEdit) {
+        await axios.put(`${API_URL}/templates/${id}`, formData);
+      } else {
+        await axios.post(`${API_URL}/templates`, formData);
+      }
       navigate('/templates');
     } catch (err) {
-      alert('Error creating template: ' + err.message);
+      alert(`Error ${isEdit ? 'updating' : 'creating'} template: ` + err.message);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="animate-spin text-emerald-600" size={48} />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Create New Template</h2>
-          <p className="text-slate-500">Design your WhatsApp message template for approval.</p>
+          <h2 className="text-2xl font-bold text-slate-900">{isEdit ? 'Edit Template' : 'Create New Template'}</h2>
+          <p className="text-slate-500">{isEdit ? 'Modify your template details.' : 'Design your WhatsApp message template for approval.'}</p>
         </div>
         <button 
           onClick={() => navigate('/templates')}
@@ -228,7 +263,7 @@ const CreateTemplate = () => {
                 className="w-full mt-8 bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all flex items-center justify-center gap-2"
              >
                <Save size={20} />
-               Create Template
+               {isEdit ? 'Update Template' : 'Create Template'}
              </button>
           </div>
         </div>

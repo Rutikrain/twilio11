@@ -16,6 +16,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/create-template" element={<CreateTemplate />} />
+            <Route path="/edit-template/:id" element={<CreateTemplate />} />
             <Route path="/send-message" element={<SendMessage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
