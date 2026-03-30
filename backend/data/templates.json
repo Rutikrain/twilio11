@@ -39,7 +39,27 @@
     "name": "Test1774875938411",
     "content": "hello",
     "_id": "1774875938446",
-    "status": "Pending",
+    "status": "Approved",
     "createdAt": "2026-03-30T13:05:38.446Z"
+  },
+  {
+    "name": "adidgd",
+    "category": "Marketing",
+    "language": "en-US",
+    "content": "hjhjn",
+    "buttons": [],
+    "_id": "1774876105974",
+    "status": "Approved",
+    "createdAt": "2026-03-30T13:08:25.974Z"
+  },
+  {
+    "name": "soham",
+    "category": "Authentication",
+    "language": "en-US",
+    "content": "jyjh",
+    "buttons": [],
+    "_id": "1774876146209",
+    "status": "Approved",
+    "createdAt": "2026-03-30T13:09:06.209Z"
   }
 ]
