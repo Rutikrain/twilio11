@@ -9,6 +9,7 @@ const SendMessage = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [variables, setVariables] = useState({});
   const [status, setStatus] = useState(null); // 'sending', 'sent', 'error'
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,6 +69,8 @@ const SendMessage = () => {
       setVariables(resetVars);
     } catch (err) {
       console.error('Send error:', err);
+      const exactError = err.response?.data?.error || err.response?.data?.message || 'Failed to send message.';
+      setErrorMessage(exactError);
       setStatus('error');
     }
   };
@@ -192,8 +195,8 @@ const SendMessage = () => {
               )}
               {status === 'error' && (
                 <div className="bg-red-50 text-red-700 p-4 rounded-xl flex items-center gap-3 border border-red-100 animate-in shake duration-200">
-                  <AlertCircle size={20} />
-                  <span className="text-sm font-semibold">Failed to send message.</span>
+                  <AlertCircle size={20} className="shrink-0" />
+                  <span className="text-sm font-semibold">{errorMessage || 'Failed to send message.'}</span>
                 </div>
               )}
 
