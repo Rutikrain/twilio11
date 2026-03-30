@@ -26,43 +26,13 @@
     "createdAt": "2026-03-26T08:27:51.493Z"
   },
   {
-    "_id": "1774514146304",
-    "name": "adidgd",
-    "category": "Marketing",
-    "language": "en-US",
-    "content": "df",
-    "buttons": [],
-    "status": "Approved",
-    "createdAt": "2026-03-26T08:35:46.304Z"
-  },
-  {
-    "_id": "1774517258946",
-    "name": "rutik",
-    "category": "Marketing",
-    "language": "en-US",
-    "content": "gfdg",
-    "buttons": [],
-    "status": "Approved",
-    "createdAt": "2026-03-26T09:27:38.946Z"
-  },
-  {
     "name": "Dr. Indu",
     "category": "Marketing",
     "language": "en-US",
-    "content": "sdfdasafs",
+    "content": "hii indu",
     "buttons": [],
-    "_id": "1774871787941",
+    "_id": "1774873441553",
     "status": "Approved",
-    "createdAt": "2026-03-30T11:56:27.941Z"
-  },
-  {
-    "name": "krishhhh",
-    "category": "Marketing",
-    "language": "en-US",
-    "content": "usuiujs",
-    "buttons": [],
-    "_id": "1774873325710",
-    "status": "Approved",
-    "createdAt": "2026-03-30T12:22:05.710Z"
+    "createdAt": "2026-03-30T12:24:01.553Z"
   }
 ]
