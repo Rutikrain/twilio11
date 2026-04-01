@@ -18,7 +18,14 @@ const writeDB = (data) => {
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 };
 
-const useFallback = () => mongoose.connection.readyState !== 1;
+const useFallback = () => {
+  // Force JSON if environment variable set or if DB is disconnected
+  if (process.env.FORCE_JSON_STORAGE === 'true') return true;
+  if (mongoose.connection.readyState !== 1) return true;
+  // Fallback if URI looks like Atlas SQL (highly recommended as standard writes fail)
+  if (process.env.MONGO_URI && process.env.MONGO_URI.includes('atlas-sql')) return true;
+  return false;
+};
 
 exports.getTemplates = async (req, res) => {
   if (useFallback()) {
@@ -71,9 +78,16 @@ exports.createTemplate = async (req, res) => {
   console.log('[DATABASE] Creating template:', req.body.name);
   const template = new Template(req.body);
   try {
-    const newTemplate = await template.save();
+    // Add a race against timeout to prevent long hangs in production
+    const savePromise = template.save();
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Database operation timed out. Please try setting FORCE_JSON_STORAGE=true.')), 8000)
+    );
+
+    const newTemplate = await Promise.race([savePromise, timeoutPromise]);
     res.status(201).json(newTemplate);
   } catch (err) {
+    console.error('❌ Template Creation Error:', err.message);
     res.status(400).json({ message: err.message });
   }
 };
