@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
+require('dotenv').config({ path: './backend/.env' });
 
 const mongoUri = process.env.MONGO_URI;
+
+if (!mongoUri) {
+  console.error('❌ ERROR: MONGO_URI is not defined in backend/.env');
+  process.exit(1);
+}
 
 console.log('🔍 Testing MongoDB Connection with URI:', mongoUri.split('@')[1] ? '...hidden password...@' + mongoUri.split('@')[1] : 'invalid host' );
 
