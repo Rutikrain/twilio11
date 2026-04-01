@@ -24,6 +24,7 @@ mongoose.connect(mongoUri, {
     console.error('❌ MongoDB Connection Error Details:');
     console.error(`   - Message: ${err.message}`);
     console.error(`   - Code: ${err.code}`);
+    console.log('⚠️ WARNING: Falling back to local JSON storage (data/templates.json)');
   });
 
 // Health Check Endpoint

@@ -22,6 +22,7 @@ const useFallback = () => mongoose.connection.readyState !== 1;
 
 exports.getTemplates = async (req, res) => {
   if (useFallback()) {
+    console.log('📂 [JSON DB] Fetching all templates from local storage');
     const data = readDB();
     data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return res.json(data);
